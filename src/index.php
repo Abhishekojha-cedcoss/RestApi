@@ -48,7 +48,6 @@ $app->before(
 );
 
 
-
 $app->get(
     '/api/products/search/{keyword}',
     [

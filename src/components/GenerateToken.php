@@ -8,6 +8,10 @@ use DateTimeImmutable;
 use Firebase\JWT\Key;
 use Firebase\JWT\JWT;
 
+/**
+ * GenerateToken class
+ * Generate the new token for differen user
+ */
 class GenerateToken implements MiddlewareInterface
 {
     public function authorizeApiToken($app)
@@ -31,11 +35,19 @@ class GenerateToken implements MiddlewareInterface
         );
 
         $token = JWT::encode($payload, $key, 'HS256');
-
         $app->response->setStatusCode(400)
             ->setJsonContent($token)
             ->send();
     }
+
+    /**
+     * validate function
+     *
+     * Validate the token provided by the user
+     * @param [type] $token
+     * @param [type] $app
+     * @return void
+     */
     public function validate($token, $app)
     {
         $key = "example_key";

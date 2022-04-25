@@ -5,14 +5,14 @@ namespace Api\Handler;
 use Phalcon\Di\Injectable;
 
 /**
- * Producr Handler class
+ * Product Handler class
  * to handle all the product requests
  */
 class Product extends Injectable
 {
     /**
-     * Get function
-     *To handle all the product get requests
+     * Search function
+     *To handle all the product search requests
      */
     public function search($keyword = "")
     {
@@ -38,6 +38,13 @@ class Product extends Injectable
         $this->response->send();
     }
 
+    /**
+     * get function
+     *
+     * @param integer $per_page
+     * @param integer $page
+     * @return void
+     */
     public function get($per_page = 2, $page = 1)
     {
         $options = [
@@ -58,6 +65,12 @@ class Product extends Injectable
         print_r($array);
     }
 
+    /**
+     * generateToken function
+     *
+     * Generate new Token
+     * @return void
+     */
     public function generateToken()
     {
     }
