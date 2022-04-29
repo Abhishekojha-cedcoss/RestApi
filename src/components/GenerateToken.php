@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Api\Components;
 
-use Phalcon\Mvc\Micro\MiddlewareInterface;
-use Phalcon\Mvc\Micro;
 use DateTimeImmutable;
+use Exception;
 use Firebase\JWT\Key;
 use Firebase\JWT\JWT;
+use Phalcon\Mvc\Micro\MiddlewareInterface;
+use Phalcon\Mvc\Micro;
 
 /**
  * GenerateToken class
@@ -14,24 +17,20 @@ use Firebase\JWT\JWT;
  */
 class GenerateToken implements MiddlewareInterface
 {
-    public function authorizeApiToken($app)
+    public function authorizeApiToken($app): void
     {
-        $now        = new DateTimeImmutable();
-        $issued     = $now->getTimestamp();
-        $key = "example_key";
-
-        $notBefore  = $now->modify('-1 minute')->getTimestamp();
-        $expires    = $now->modify('+1 day')->getTimestamp();
+        $now = new DateTimeImmutable();
+        $key = 'example_key';
         $passphrase = 'QcMpZ&b&mo3TPsPk668J6QH8JA$&U&m2';
 
         $payload = array(
-            "name" => "abhishek",
-            "iss" => "'https://phalcon.io'",
-            "exp " => $expires,
-            "aud" => "https://target.phalcon.io",
-            "iat" => $issued,
-            "nbf" => $notBefore,
-            "password" => $passphrase
+            'name' => 'abhishek',
+            'iss' => 'https://phalcon.io',
+            'exp ' => $now->modify('+1 day')->getTimestamp(),
+            'aud' => 'https://target.phalcon.io',
+            'iat' => $now->getTimestamp(),
+            'nbf' => $now->modify('-1 minute')->getTimestamp(),
+            'password' => $passphrase
         );
 
         $token = JWT::encode($payload, $key, 'HS256');
@@ -44,22 +43,25 @@ class GenerateToken implements MiddlewareInterface
      * validate function
      *
      * Validate the token provided by the user
-     * @param [type] $token
-     * @param [type] $app
-     * @return void
      */
-    public function validate($token, $app)
+    public function validate($token, $app): void
     {
-        $key = "example_key";
-        $decoded = JWT::decode($token, new Key($key, 'HS256'));
+        try {
+            $decoded = JWT::decode($token, new Key('example_key', 'HS256'));
+        } catch (Exception $err) {
+            $app->response->setStatusCode(404)
+                ->setJsonContent("Token has expired!")
+                ->send();
+        }
     }
-    public function call(Micro $app)
+
+    public function call(Micro $app): void
     {
-        $check = explode('/', $app->request->get()['_url'])[1];
-        if ($check == "/api/generateApiToken") {
+        $check = explode('/', $app->request->get()['_url'])[2];
+        if ($check === 'generateApiToken') {
             $this->authorizeApiToken($app);
         } else {
-            $token =  $app->request->get("token");
+            $token = $app->request->get('token');
             $this->validate($token, $app);
         }
     }

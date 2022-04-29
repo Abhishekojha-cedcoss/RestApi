@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Api\Handler;
 
 use Phalcon\Di\Injectable;
@@ -14,22 +16,21 @@ class Product extends Injectable
      * Search function
      *To handle all the product search requests
      */
-    public function search($keyword = "")
+    public function search(string $keyword = ''): void
     {
-        $key = urldecode($keyword);
-        $ar = explode(' ', $key);
+        $arr = explode(' ', urldecode($keyword));
         $response = [];
-        $str = "";
-        foreach ($ar as $key => $value) {
-            $str .= $value . "|";
+        $str = '';
+        foreach ($arr as $key => $value) {
+            $str .= $value . '|';
         }
         $str = substr($str, 0, -1);
-        $res = $this->mongo->products->find(["name" =>  ['$regex' => $str, '$options' => 'i']])->toArray();
+        $res = $this->mongo->products->find(['name' =>  ['$regex' => $str, '$options' => 'i']])->toArray();
         foreach ($res as $key => $value) {
-            $id = (array)$value["_id"];
+            $id = (array) $value['_id'];
             $res = [
-                "id" => $id["oid"],
-                "name" => $value['name'],
+                'id' => $id['oid'],
+                'name' => $value['name'],
             ];
             array_push($response, $res);
         }
@@ -41,24 +42,23 @@ class Product extends Injectable
     /**
      * get function
      *
-     * @param integer $per_page
-     * @param integer $page
-     * @return void
+     * @param int $per_page
+     * @param int $page
      */
-    public function get($per_page = 2, $page = 1)
+    public function get($per_page = 2, $page = 1): void
     {
         $options = [
-            "limit" => (int)$per_page,
-            "skip"  => (int)(($page - 1) * $per_page)
+            'limit' => (int)$per_page,
+            'skip'  => (int)(($page - 1) * $per_page)
         ];
         $array = [];
         $products =  $this->mongo->products->find([], $options);
         $products = $products->toArray();
         foreach ($products as $key => $value) {
-            $id = (array)$value["_id"];
+            $id = (array)$value['_id'];
             $res = [
-                "id" => $id["oid"],
-                "name" => $value['name'],
+                'id' => $id['oid'],
+                'name' => $value['name'],
             ];
             array_push($array, $res);
         }
@@ -69,9 +69,8 @@ class Product extends Injectable
      * generateToken function
      *
      * Generate new Token
-     * @return void
      */
-    public function generateToken()
+    public function generateToken(): void
     {
     }
 }

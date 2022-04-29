@@ -1,11 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
 require './vendor/autoload.php';
 
 use Api\Handler\Product;
-use Phalcon\Mvc\Micro;
-use Phalcon\Loader;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Events\Manager as EventsManager;
+use Phalcon\Loader;
+use Phalcon\Mvc\Micro;
 
 $loader = new Loader();
 $loader->registerNamespaces(
@@ -17,7 +20,6 @@ $loader->registerNamespaces(
 
 $loader->register();
 
-
 $container = new FactoryDefault();
 $app =  new Micro($container);
 
@@ -25,11 +27,11 @@ $container->set(
     'mongo',
     function () {
         $mongo = new \MongoDB\Client(
-            "mongodb://mongo",
-            array(
-                "username" => 'root',
-                "password" => "password123"
-            )
+            'mongodb://mongo',
+            [
+                'username' => 'root',
+                'password' => 'password123',
+            ]
         );
         return $mongo->store;
     },
@@ -46,7 +48,6 @@ $eventsManager->attach(
 $app->before(
     new Api\Components\GenerateToken()
 );
-
 
 $app->get(
     '/api/products/search/{keyword}',
@@ -74,5 +75,5 @@ $app->get(
 
 $app->setEventsManager($eventsManager);
 $app->handle(
-    $_SERVER["REQUEST_URI"]
+    $_SERVER['REQUEST_URI']
 );
