@@ -6,8 +6,8 @@ namespace Api\Components;
 
 use DateTimeImmutable;
 use Exception;
-use Firebase\JWT\Key;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Phalcon\Mvc\Micro\MiddlewareInterface;
 use Phalcon\Mvc\Micro;
 
@@ -15,7 +15,7 @@ use Phalcon\Mvc\Micro;
  * GenerateToken class
  * Generate the new token for differen user
  */
-class GenerateToken implements MiddlewareInterface
+final class GenerateToken implements MiddlewareInterface
 {
     public function authorizeApiToken($app): void
     {
@@ -23,7 +23,7 @@ class GenerateToken implements MiddlewareInterface
         $key = 'example_key';
         $passphrase = 'QcMpZ&b&mo3TPsPk668J6QH8JA$&U&m2';
 
-        $payload = array(
+        $payload = [
             'name' => 'abhishek',
             'iss' => 'https://phalcon.io',
             'exp ' => $now->modify('+1 day')->getTimestamp(),
@@ -31,7 +31,7 @@ class GenerateToken implements MiddlewareInterface
             'iat' => $now->getTimestamp(),
             'nbf' => $now->modify('-1 minute')->getTimestamp(),
             'password' => $passphrase
-        );
+        ];
 
         $token = JWT::encode($payload, $key, 'HS256');
         $app->response->setStatusCode(400)
@@ -43,14 +43,16 @@ class GenerateToken implements MiddlewareInterface
      * validate function
      *
      * Validate the token provided by the user
+     *
+     * @param string $token
      */
-    public function validate($token, $app): void
+    public function validate(string $token, $app): void
     {
         try {
-            $decoded = JWT::decode($token, new Key('example_key', 'HS256'));
+            JWT::decode($token, new Key('example_key', 'HS256'));
         } catch (Exception $err) {
             $app->response->setStatusCode(404)
-                ->setJsonContent("Token has expired!")
+                ->setJsonContent('Token has expired!')
                 ->send();
         }
     }

@@ -10,7 +10,7 @@ use Phalcon\Di\Injectable;
  * Product Handler class
  * to handle all the product requests
  */
-class Product extends Injectable
+final class Product extends Injectable
 {
     /**
      * Search function
@@ -25,7 +25,7 @@ class Product extends Injectable
             $str .= $value . '|';
         }
         $str = substr($str, 0, -1);
-        $res = $this->mongo->products->find(['name' =>  ['$regex' => $str, '$options' => 'i']])->toArray();
+        $res = $this->mongo->products->find(['name' => ['$regex' => $str, '$options' => 'i']])->toArray();
         foreach ($res as $key => $value) {
             $id = (array) $value['_id'];
             $res = [
@@ -48,14 +48,14 @@ class Product extends Injectable
     public function get($per_page = 2, $page = 1): void
     {
         $options = [
-            'limit' => (int)$per_page,
-            'skip'  => (int)(($page - 1) * $per_page)
+            'limit' => (int) $per_page,
+            'skip'  => (int) (($page - 1) * $per_page)
         ];
         $array = [];
-        $products =  $this->mongo->products->find([], $options);
+        $products = $this->mongo->products->find([], $options);
         $products = $products->toArray();
         foreach ($products as $key => $value) {
-            $id = (array)$value['_id'];
+            $id = (array) $value['_id'];
             $res = [
                 'id' => $id['oid'],
                 'name' => $value['name'],

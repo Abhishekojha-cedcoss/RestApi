@@ -21,7 +21,7 @@ $loader->registerNamespaces(
 $loader->register();
 
 $container = new FactoryDefault();
-$app =  new Micro($container);
+$app = new Micro($container);
 
 $container->set(
     'mongo',
